@@ -79,9 +79,9 @@ def lookup_song(yt, track_name, artist_name, album_name):
     #  This would need to do fuzzy matching
     for song in songs:
         if (
-            song["title"] == track_name
-            and song["artists"][0]["name"] == artist_name
-            and song["album"]["name"] == album_name
+                song["title"] == track_name
+                and song["artists"][0]["name"] == artist_name
+                and song["album"]["name"] == album_name
         ):
             return song
         # print(f"SONG: {song['videoId']} - {song['title']} - {song['artists'][0]['name']} - {song['album']['name']}")
@@ -139,7 +139,7 @@ def copy_playlist():
             help="ID of the Spotify playlist to copy from",
         )
         parser.add_argument(
-            "ytmusic_playlist_id",
+            "--ytmusic_playlist_id",  # Maybe make this name shorter
             type=str,
             help="ID of the YTMusic playlist to copy to",
         )
@@ -148,17 +148,22 @@ def copy_playlist():
 
     args = parse_arguments()
     src_pl_id = args.spotify_playlist_id
-    dst_pl_id = args.ytmusic_playlist_id
+
+    if args.ytmusic_playlist_id is None:
+        pl_name = input("What is the name of the new playlist?\n")
+        dst_pl_id = YTMusic("oauth.json").create_playlist(title=pl_name, description=pl_name)
+    else:
+        dst_pl_id = args.ytmusic_playlist_id
 
     copier(src_pl_id, dst_pl_id, args.dry_run, args.track_sleep)
 
 
 def copier(
-    src_pl_id: Optional[str] = None,
-    dst_pl_id: Optional[str] = None,
-    dry_run: bool = False,
-    track_sleep: float = 0.1,
-    spotify_playlist_file: str = "playlists.json",
+        src_pl_id: Optional[str] = None,
+        dst_pl_id: Optional[str] = None,
+        dry_run: bool = False,
+        track_sleep: float = 0.1,
+        spotify_playlist_file: str = "playlists.json",
 ):
     yt = YTMusic("oauth.json")
 
